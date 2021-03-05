@@ -11,16 +11,6 @@ target_link_libraries(raftcpp
                                 ${PROTOBUF_LIBRARIES}
                                 ${ZLIB_LIBRARIES})         
 
-# 添加项目用到的所有库
-# SET(LIBS 
-#     raftcpp
-#     reyao
-#     pthread
-#     dl
-#     ${PROTOBUF_LIBRARIES}
-#     ${ZLIB_LIBRARIES}
-# )
-
 # 安装动态库与头文件
 install(TARGETS raftcpp
         ARCHIVE DESTINATION /usr/lib

@@ -2,7 +2,7 @@
 #include "../src/polished_rpc_client.h"
 
 #include <gtest/gtest.h>
-#include <reyao/util.h>
+#include "reyao/util.h"
 
 namespace raftcpp {
 

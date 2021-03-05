@@ -8,33 +8,25 @@ using namespace reyao;
 namespace raftcpp {
 
 TEST(raft_election_test, TestReElection) {
-    g_logger->setFormatter("[%p %f:%l]%T%m%n");
     g_logger->setLevel(LogLevel::INFO);
 
     Scheduler sche;
+    Config cfg(&sche, 10);
+    sche.startAsync();
 
-    sche.addTask([&]() {
-        Config cfg(&sche, 10);
-
-        usleep(10 * 1000);
-        int iters = 3;
-        for (int idx = 1; idx < iters + 1; ++idx) {
-            int nd = cfg.nCommitted(idx);
-            if (nd > 0) {
-                LOG_FATAL << "some have committed before start";
-            }
-             
-            int xidx = cfg.one(std::to_string(idx * 100), 5, false);
-            if (xidx != idx) {
-                LOG_FATAL << "got index " << xidx << " but expected" <<idx;
-            }
-
+    usleep(10 * 1000);
+    int iters = 3;
+    for (int idx = 1; idx < iters + 1; ++idx) {
+        int nd = cfg.nCommitted(idx);
+        if (nd > 0) {
+            LOG_FATAL << "some have committed before start";
         }
 
-        Worker::GetWorker()->getScheduler()->stop();
-    });
-
-    sche.start();
+        int xidx = cfg.one(std::to_string(idx * 100), 5, false);
+        if (xidx != idx) {
+            LOG_FATAL << "got index " << xidx << " but expected" << idx;
+        }
+    }
 }
 
 } // namespace raftcpp
