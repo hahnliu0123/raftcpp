@@ -148,22 +148,21 @@ int Config::one(const std::string& cmd, int32_t expected_server, bool retry) {
         do {
             int nc = nCommitted(index);
             if (nc > 0 && nc >= expected_server) {
-                LOG_INFO << "pass one(), index:" << index;
                 return index;
             }
             usleep(20 * 1000);
             now = reyao::GetCurrentTime();
-        } while (now < start1 + 2 * 1000 * 1000); // 每20ms重试一次，总时长为2s
+        } while (now < start1 + 2 * 1000); // 每 20 ms 重试一次，总时长为 2 s
 
         if (!retry) {
-            LOG_ERROR << "cmd[" << cmd << "] failed to reach agreement";
+            LOG_FMT_ERROR("cmd[%s] failed to reach agreement", cmd.c_str());
         } else {
-            usleep(50 * 1000); // 如果leader添加log失败，等待50ms后重新append log
+            usleep(50 * 1000); // 如果 leader 添加 log 失败，等待 50 ms 后重新 append log
         }
 
         now = reyao::GetCurrentTime();
-    } while (now  < start + 10 * 1000 * 1000); // total expired time 10s.
-    LOG_ERROR << "failed to reach agreement";
+    } while (now  < start + 3 * 1000); // total expired time 3 s.
+    LOG_FMT_ERROR("failed to reach agreement");
     return -1;
 }
 
@@ -178,7 +177,6 @@ void Config::applyFunc(uint32_t server, LogEntry entry) {
             }
         }
         logs_[server].push_back(entry);
-        LOG_DEBUG << server << " apply Log index:" << index << " cmd:" << entry.command();
     }
 }
 
@@ -197,6 +195,18 @@ std::shared_ptr<Raft> Config::makeRaft(uint32_t server, uint32_t num,
     raft->setApplyLogFunc(std::bind(&Config::applyFunc, this, std::placeholders::_1,
                                     std::placeholders::_2));
     return raft;
+}
+
+void Config::printLogs() {
+    for (uint32_t i = 0; i < num_; i++) {
+        const auto& logs = getLog(i);
+        std::stringstream ss;
+        ss << "server " << i << " ";
+        for (auto& log : logs) {
+            ss << log.command() << " ";
+        }
+        LOG_INFO << ss.str();
+    }
 }
 
 } //namespace raftcpp

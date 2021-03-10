@@ -27,6 +27,9 @@ public:
 
     void applyFunc(uint32_t server, LogEntry entry);
 
+    std::vector<LogEntry>& getLog(int server) { return logs_[server]; }
+    void printLogs();
+
 private:
     std::shared_ptr<Raft> makeRaft(uint32_t server, uint32_t num, reyao::Scheduler* sche);
 

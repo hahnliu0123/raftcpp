@@ -47,7 +47,7 @@ struct TableStruct_args_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[5]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -60,6 +60,12 @@ extern AppendEntriesArgsDefaultTypeInternal _AppendEntriesArgs_default_instance_
 class AppendEntriesReply;
 class AppendEntriesReplyDefaultTypeInternal;
 extern AppendEntriesReplyDefaultTypeInternal _AppendEntriesReply_default_instance_;
+class KvCommand;
+class KvCommandDefaultTypeInternal;
+extern KvCommandDefaultTypeInternal _KvCommand_default_instance_;
+class KvCommandReply;
+class KvCommandReplyDefaultTypeInternal;
+extern KvCommandReplyDefaultTypeInternal _KvCommandReply_default_instance_;
 class LogEntry;
 class LogEntryDefaultTypeInternal;
 extern LogEntryDefaultTypeInternal _LogEntry_default_instance_;
@@ -72,6 +78,8 @@ extern RequestVoteReplyDefaultTypeInternal _RequestVoteReply_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
 template<> ::AppendEntriesArgs* Arena::CreateMaybeMessage<::AppendEntriesArgs>(Arena*);
 template<> ::AppendEntriesReply* Arena::CreateMaybeMessage<::AppendEntriesReply>(Arena*);
+template<> ::KvCommand* Arena::CreateMaybeMessage<::KvCommand>(Arena*);
+template<> ::KvCommandReply* Arena::CreateMaybeMessage<::KvCommandReply>(Arena*);
 template<> ::LogEntry* Arena::CreateMaybeMessage<::LogEntry>(Arena*);
 template<> ::RequestVoteArgs* Arena::CreateMaybeMessage<::RequestVoteArgs>(Arena*);
 template<> ::RequestVoteReply* Arena::CreateMaybeMessage<::RequestVoteReply>(Arena*);
@@ -1059,6 +1067,432 @@ class AppendEntriesReply PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::uint32 conflict_term_;
   friend struct ::TableStruct_args_2eproto;
 };
+// -------------------------------------------------------------------
+
+class KvCommand PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:KvCommand) */ {
+ public:
+  inline KvCommand() : KvCommand(nullptr) {}
+  virtual ~KvCommand();
+
+  KvCommand(const KvCommand& from);
+  KvCommand(KvCommand&& from) noexcept
+    : KvCommand() {
+    *this = ::std::move(from);
+  }
+
+  inline KvCommand& operator=(const KvCommand& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline KvCommand& operator=(KvCommand&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const KvCommand& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const KvCommand* internal_default_instance() {
+    return reinterpret_cast<const KvCommand*>(
+               &_KvCommand_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  friend void swap(KvCommand& a, KvCommand& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(KvCommand* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(KvCommand* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline KvCommand* New() const final {
+    return CreateMaybeMessage<KvCommand>(nullptr);
+  }
+
+  KvCommand* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<KvCommand>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const KvCommand& from);
+  void MergeFrom(const KvCommand& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(KvCommand* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "KvCommand";
+  }
+  protected:
+  explicit KvCommand(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_args_2eproto);
+    return ::descriptor_table_args_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kOperationFieldNumber = 1,
+    kKeyFieldNumber = 2,
+    kValueFieldNumber = 3,
+    kCidFieldNumber = 4,
+    kSeqFieldNumber = 5,
+  };
+  // required string operation = 1;
+  bool has_operation() const;
+  private:
+  bool _internal_has_operation() const;
+  public:
+  void clear_operation();
+  const std::string& operation() const;
+  void set_operation(const std::string& value);
+  void set_operation(std::string&& value);
+  void set_operation(const char* value);
+  void set_operation(const char* value, size_t size);
+  std::string* mutable_operation();
+  std::string* release_operation();
+  void set_allocated_operation(std::string* operation);
+  private:
+  const std::string& _internal_operation() const;
+  void _internal_set_operation(const std::string& value);
+  std::string* _internal_mutable_operation();
+  public:
+
+  // required string key = 2;
+  bool has_key() const;
+  private:
+  bool _internal_has_key() const;
+  public:
+  void clear_key();
+  const std::string& key() const;
+  void set_key(const std::string& value);
+  void set_key(std::string&& value);
+  void set_key(const char* value);
+  void set_key(const char* value, size_t size);
+  std::string* mutable_key();
+  std::string* release_key();
+  void set_allocated_key(std::string* key);
+  private:
+  const std::string& _internal_key() const;
+  void _internal_set_key(const std::string& value);
+  std::string* _internal_mutable_key();
+  public:
+
+  // optional string value = 3;
+  bool has_value() const;
+  private:
+  bool _internal_has_value() const;
+  public:
+  void clear_value();
+  const std::string& value() const;
+  void set_value(const std::string& value);
+  void set_value(std::string&& value);
+  void set_value(const char* value);
+  void set_value(const char* value, size_t size);
+  std::string* mutable_value();
+  std::string* release_value();
+  void set_allocated_value(std::string* value);
+  private:
+  const std::string& _internal_value() const;
+  void _internal_set_value(const std::string& value);
+  std::string* _internal_mutable_value();
+  public:
+
+  // required int64 cid = 4;
+  bool has_cid() const;
+  private:
+  bool _internal_has_cid() const;
+  public:
+  void clear_cid();
+  ::PROTOBUF_NAMESPACE_ID::int64 cid() const;
+  void set_cid(::PROTOBUF_NAMESPACE_ID::int64 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_cid() const;
+  void _internal_set_cid(::PROTOBUF_NAMESPACE_ID::int64 value);
+  public:
+
+  // required uint32 seq = 5;
+  bool has_seq() const;
+  private:
+  bool _internal_has_seq() const;
+  public:
+  void clear_seq();
+  ::PROTOBUF_NAMESPACE_ID::uint32 seq() const;
+  void set_seq(::PROTOBUF_NAMESPACE_ID::uint32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::uint32 _internal_seq() const;
+  void _internal_set_seq(::PROTOBUF_NAMESPACE_ID::uint32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:KvCommand)
+ private:
+  class _Internal;
+
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr operation_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr key_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr value_;
+  ::PROTOBUF_NAMESPACE_ID::int64 cid_;
+  ::PROTOBUF_NAMESPACE_ID::uint32 seq_;
+  friend struct ::TableStruct_args_2eproto;
+};
+// -------------------------------------------------------------------
+
+class KvCommandReply PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:KvCommandReply) */ {
+ public:
+  inline KvCommandReply() : KvCommandReply(nullptr) {}
+  virtual ~KvCommandReply();
+
+  KvCommandReply(const KvCommandReply& from);
+  KvCommandReply(KvCommandReply&& from) noexcept
+    : KvCommandReply() {
+    *this = ::std::move(from);
+  }
+
+  inline KvCommandReply& operator=(const KvCommandReply& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline KvCommandReply& operator=(KvCommandReply&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const KvCommandReply& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const KvCommandReply* internal_default_instance() {
+    return reinterpret_cast<const KvCommandReply*>(
+               &_KvCommandReply_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  friend void swap(KvCommandReply& a, KvCommandReply& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(KvCommandReply* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(KvCommandReply* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline KvCommandReply* New() const final {
+    return CreateMaybeMessage<KvCommandReply>(nullptr);
+  }
+
+  KvCommandReply* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<KvCommandReply>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const KvCommandReply& from);
+  void MergeFrom(const KvCommandReply& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(KvCommandReply* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "KvCommandReply";
+  }
+  protected:
+  explicit KvCommandReply(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_args_2eproto);
+    return ::descriptor_table_args_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kErrorFieldNumber = 2,
+    kValueFieldNumber = 3,
+    kLeaderFieldNumber = 1,
+  };
+  // optional string error = 2;
+  bool has_error() const;
+  private:
+  bool _internal_has_error() const;
+  public:
+  void clear_error();
+  const std::string& error() const;
+  void set_error(const std::string& value);
+  void set_error(std::string&& value);
+  void set_error(const char* value);
+  void set_error(const char* value, size_t size);
+  std::string* mutable_error();
+  std::string* release_error();
+  void set_allocated_error(std::string* error);
+  private:
+  const std::string& _internal_error() const;
+  void _internal_set_error(const std::string& value);
+  std::string* _internal_mutable_error();
+  public:
+
+  // optional string value = 3;
+  bool has_value() const;
+  private:
+  bool _internal_has_value() const;
+  public:
+  void clear_value();
+  const std::string& value() const;
+  void set_value(const std::string& value);
+  void set_value(std::string&& value);
+  void set_value(const char* value);
+  void set_value(const char* value, size_t size);
+  std::string* mutable_value();
+  std::string* release_value();
+  void set_allocated_value(std::string* value);
+  private:
+  const std::string& _internal_value() const;
+  void _internal_set_value(const std::string& value);
+  std::string* _internal_mutable_value();
+  public:
+
+  // required bool leader = 1;
+  bool has_leader() const;
+  private:
+  bool _internal_has_leader() const;
+  public:
+  void clear_leader();
+  bool leader() const;
+  void set_leader(bool value);
+  private:
+  bool _internal_leader() const;
+  void _internal_set_leader(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:KvCommandReply)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr error_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr value_;
+  bool leader_;
+  friend struct ::TableStruct_args_2eproto;
+};
 // ===================================================================
 
 
@@ -1675,9 +2109,475 @@ inline void AppendEntriesReply::set_conflict_term(::PROTOBUF_NAMESPACE_ID::uint3
   // @@protoc_insertion_point(field_set:AppendEntriesReply.conflict_term)
 }
 
+// -------------------------------------------------------------------
+
+// KvCommand
+
+// required string operation = 1;
+inline bool KvCommand::_internal_has_operation() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool KvCommand::has_operation() const {
+  return _internal_has_operation();
+}
+inline void KvCommand::clear_operation() {
+  operation_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline const std::string& KvCommand::operation() const {
+  // @@protoc_insertion_point(field_get:KvCommand.operation)
+  return _internal_operation();
+}
+inline void KvCommand::set_operation(const std::string& value) {
+  _internal_set_operation(value);
+  // @@protoc_insertion_point(field_set:KvCommand.operation)
+}
+inline std::string* KvCommand::mutable_operation() {
+  // @@protoc_insertion_point(field_mutable:KvCommand.operation)
+  return _internal_mutable_operation();
+}
+inline const std::string& KvCommand::_internal_operation() const {
+  return operation_.Get();
+}
+inline void KvCommand::_internal_set_operation(const std::string& value) {
+  _has_bits_[0] |= 0x00000001u;
+  operation_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void KvCommand::set_operation(std::string&& value) {
+  _has_bits_[0] |= 0x00000001u;
+  operation_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:KvCommand.operation)
+}
+inline void KvCommand::set_operation(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000001u;
+  operation_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:KvCommand.operation)
+}
+inline void KvCommand::set_operation(const char* value,
+    size_t size) {
+  _has_bits_[0] |= 0x00000001u;
+  operation_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:KvCommand.operation)
+}
+inline std::string* KvCommand::_internal_mutable_operation() {
+  _has_bits_[0] |= 0x00000001u;
+  return operation_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* KvCommand::release_operation() {
+  // @@protoc_insertion_point(field_release:KvCommand.operation)
+  if (!_internal_has_operation()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return operation_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void KvCommand::set_allocated_operation(std::string* operation) {
+  if (operation != nullptr) {
+    _has_bits_[0] |= 0x00000001u;
+  } else {
+    _has_bits_[0] &= ~0x00000001u;
+  }
+  operation_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), operation,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:KvCommand.operation)
+}
+
+// required string key = 2;
+inline bool KvCommand::_internal_has_key() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool KvCommand::has_key() const {
+  return _internal_has_key();
+}
+inline void KvCommand::clear_key() {
+  key_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline const std::string& KvCommand::key() const {
+  // @@protoc_insertion_point(field_get:KvCommand.key)
+  return _internal_key();
+}
+inline void KvCommand::set_key(const std::string& value) {
+  _internal_set_key(value);
+  // @@protoc_insertion_point(field_set:KvCommand.key)
+}
+inline std::string* KvCommand::mutable_key() {
+  // @@protoc_insertion_point(field_mutable:KvCommand.key)
+  return _internal_mutable_key();
+}
+inline const std::string& KvCommand::_internal_key() const {
+  return key_.Get();
+}
+inline void KvCommand::_internal_set_key(const std::string& value) {
+  _has_bits_[0] |= 0x00000002u;
+  key_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void KvCommand::set_key(std::string&& value) {
+  _has_bits_[0] |= 0x00000002u;
+  key_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:KvCommand.key)
+}
+inline void KvCommand::set_key(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000002u;
+  key_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:KvCommand.key)
+}
+inline void KvCommand::set_key(const char* value,
+    size_t size) {
+  _has_bits_[0] |= 0x00000002u;
+  key_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:KvCommand.key)
+}
+inline std::string* KvCommand::_internal_mutable_key() {
+  _has_bits_[0] |= 0x00000002u;
+  return key_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* KvCommand::release_key() {
+  // @@protoc_insertion_point(field_release:KvCommand.key)
+  if (!_internal_has_key()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000002u;
+  return key_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void KvCommand::set_allocated_key(std::string* key) {
+  if (key != nullptr) {
+    _has_bits_[0] |= 0x00000002u;
+  } else {
+    _has_bits_[0] &= ~0x00000002u;
+  }
+  key_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), key,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:KvCommand.key)
+}
+
+// optional string value = 3;
+inline bool KvCommand::_internal_has_value() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool KvCommand::has_value() const {
+  return _internal_has_value();
+}
+inline void KvCommand::clear_value() {
+  value_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline const std::string& KvCommand::value() const {
+  // @@protoc_insertion_point(field_get:KvCommand.value)
+  return _internal_value();
+}
+inline void KvCommand::set_value(const std::string& value) {
+  _internal_set_value(value);
+  // @@protoc_insertion_point(field_set:KvCommand.value)
+}
+inline std::string* KvCommand::mutable_value() {
+  // @@protoc_insertion_point(field_mutable:KvCommand.value)
+  return _internal_mutable_value();
+}
+inline const std::string& KvCommand::_internal_value() const {
+  return value_.Get();
+}
+inline void KvCommand::_internal_set_value(const std::string& value) {
+  _has_bits_[0] |= 0x00000004u;
+  value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void KvCommand::set_value(std::string&& value) {
+  _has_bits_[0] |= 0x00000004u;
+  value_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:KvCommand.value)
+}
+inline void KvCommand::set_value(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000004u;
+  value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:KvCommand.value)
+}
+inline void KvCommand::set_value(const char* value,
+    size_t size) {
+  _has_bits_[0] |= 0x00000004u;
+  value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:KvCommand.value)
+}
+inline std::string* KvCommand::_internal_mutable_value() {
+  _has_bits_[0] |= 0x00000004u;
+  return value_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* KvCommand::release_value() {
+  // @@protoc_insertion_point(field_release:KvCommand.value)
+  if (!_internal_has_value()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000004u;
+  return value_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void KvCommand::set_allocated_value(std::string* value) {
+  if (value != nullptr) {
+    _has_bits_[0] |= 0x00000004u;
+  } else {
+    _has_bits_[0] &= ~0x00000004u;
+  }
+  value_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:KvCommand.value)
+}
+
+// required int64 cid = 4;
+inline bool KvCommand::_internal_has_cid() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool KvCommand::has_cid() const {
+  return _internal_has_cid();
+}
+inline void KvCommand::clear_cid() {
+  cid_ = PROTOBUF_LONGLONG(0);
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 KvCommand::_internal_cid() const {
+  return cid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 KvCommand::cid() const {
+  // @@protoc_insertion_point(field_get:KvCommand.cid)
+  return _internal_cid();
+}
+inline void KvCommand::_internal_set_cid(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  _has_bits_[0] |= 0x00000008u;
+  cid_ = value;
+}
+inline void KvCommand::set_cid(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  _internal_set_cid(value);
+  // @@protoc_insertion_point(field_set:KvCommand.cid)
+}
+
+// required uint32 seq = 5;
+inline bool KvCommand::_internal_has_seq() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool KvCommand::has_seq() const {
+  return _internal_has_seq();
+}
+inline void KvCommand::clear_seq() {
+  seq_ = 0u;
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint32 KvCommand::_internal_seq() const {
+  return seq_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint32 KvCommand::seq() const {
+  // @@protoc_insertion_point(field_get:KvCommand.seq)
+  return _internal_seq();
+}
+inline void KvCommand::_internal_set_seq(::PROTOBUF_NAMESPACE_ID::uint32 value) {
+  _has_bits_[0] |= 0x00000010u;
+  seq_ = value;
+}
+inline void KvCommand::set_seq(::PROTOBUF_NAMESPACE_ID::uint32 value) {
+  _internal_set_seq(value);
+  // @@protoc_insertion_point(field_set:KvCommand.seq)
+}
+
+// -------------------------------------------------------------------
+
+// KvCommandReply
+
+// required bool leader = 1;
+inline bool KvCommandReply::_internal_has_leader() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool KvCommandReply::has_leader() const {
+  return _internal_has_leader();
+}
+inline void KvCommandReply::clear_leader() {
+  leader_ = false;
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline bool KvCommandReply::_internal_leader() const {
+  return leader_;
+}
+inline bool KvCommandReply::leader() const {
+  // @@protoc_insertion_point(field_get:KvCommandReply.leader)
+  return _internal_leader();
+}
+inline void KvCommandReply::_internal_set_leader(bool value) {
+  _has_bits_[0] |= 0x00000004u;
+  leader_ = value;
+}
+inline void KvCommandReply::set_leader(bool value) {
+  _internal_set_leader(value);
+  // @@protoc_insertion_point(field_set:KvCommandReply.leader)
+}
+
+// optional string error = 2;
+inline bool KvCommandReply::_internal_has_error() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool KvCommandReply::has_error() const {
+  return _internal_has_error();
+}
+inline void KvCommandReply::clear_error() {
+  error_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline const std::string& KvCommandReply::error() const {
+  // @@protoc_insertion_point(field_get:KvCommandReply.error)
+  return _internal_error();
+}
+inline void KvCommandReply::set_error(const std::string& value) {
+  _internal_set_error(value);
+  // @@protoc_insertion_point(field_set:KvCommandReply.error)
+}
+inline std::string* KvCommandReply::mutable_error() {
+  // @@protoc_insertion_point(field_mutable:KvCommandReply.error)
+  return _internal_mutable_error();
+}
+inline const std::string& KvCommandReply::_internal_error() const {
+  return error_.Get();
+}
+inline void KvCommandReply::_internal_set_error(const std::string& value) {
+  _has_bits_[0] |= 0x00000001u;
+  error_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void KvCommandReply::set_error(std::string&& value) {
+  _has_bits_[0] |= 0x00000001u;
+  error_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:KvCommandReply.error)
+}
+inline void KvCommandReply::set_error(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000001u;
+  error_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:KvCommandReply.error)
+}
+inline void KvCommandReply::set_error(const char* value,
+    size_t size) {
+  _has_bits_[0] |= 0x00000001u;
+  error_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:KvCommandReply.error)
+}
+inline std::string* KvCommandReply::_internal_mutable_error() {
+  _has_bits_[0] |= 0x00000001u;
+  return error_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* KvCommandReply::release_error() {
+  // @@protoc_insertion_point(field_release:KvCommandReply.error)
+  if (!_internal_has_error()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return error_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void KvCommandReply::set_allocated_error(std::string* error) {
+  if (error != nullptr) {
+    _has_bits_[0] |= 0x00000001u;
+  } else {
+    _has_bits_[0] &= ~0x00000001u;
+  }
+  error_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), error,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:KvCommandReply.error)
+}
+
+// optional string value = 3;
+inline bool KvCommandReply::_internal_has_value() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool KvCommandReply::has_value() const {
+  return _internal_has_value();
+}
+inline void KvCommandReply::clear_value() {
+  value_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline const std::string& KvCommandReply::value() const {
+  // @@protoc_insertion_point(field_get:KvCommandReply.value)
+  return _internal_value();
+}
+inline void KvCommandReply::set_value(const std::string& value) {
+  _internal_set_value(value);
+  // @@protoc_insertion_point(field_set:KvCommandReply.value)
+}
+inline std::string* KvCommandReply::mutable_value() {
+  // @@protoc_insertion_point(field_mutable:KvCommandReply.value)
+  return _internal_mutable_value();
+}
+inline const std::string& KvCommandReply::_internal_value() const {
+  return value_.Get();
+}
+inline void KvCommandReply::_internal_set_value(const std::string& value) {
+  _has_bits_[0] |= 0x00000002u;
+  value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void KvCommandReply::set_value(std::string&& value) {
+  _has_bits_[0] |= 0x00000002u;
+  value_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:KvCommandReply.value)
+}
+inline void KvCommandReply::set_value(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000002u;
+  value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:KvCommandReply.value)
+}
+inline void KvCommandReply::set_value(const char* value,
+    size_t size) {
+  _has_bits_[0] |= 0x00000002u;
+  value_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:KvCommandReply.value)
+}
+inline std::string* KvCommandReply::_internal_mutable_value() {
+  _has_bits_[0] |= 0x00000002u;
+  return value_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* KvCommandReply::release_value() {
+  // @@protoc_insertion_point(field_release:KvCommandReply.value)
+  if (!_internal_has_value()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000002u;
+  return value_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void KvCommandReply::set_allocated_value(std::string* value) {
+  if (value != nullptr) {
+    _has_bits_[0] |= 0x00000002u;
+  } else {
+    _has_bits_[0] &= ~0x00000002u;
+  }
+  value_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:KvCommandReply.value)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

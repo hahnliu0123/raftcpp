@@ -16,9 +16,10 @@ Raft::Raft(std::vector<PolishedRpcClient::SPtr> peers, uint32_t me,
       num_of_vote_(0),
       commit_index_(0),
       last_applied_(0),
-      next_index_(0),
-      match_index_(0),
+      next_index_(),
+      match_index_(),
       last_broadcast_time_(0),
+      apply_func_(std::bind(&Raft::defaultApplyFunc, this, std::placeholders::_1, std::placeholders::_2)),
       role_(Role::Follower),
       last_active_time_(reyao::GetCurrentTime()),
       sche_(sche),
@@ -36,6 +37,9 @@ Raft::Raft(std::vector<PolishedRpcClient::SPtr> peers, uint32_t me,
     dummy.set_index(0);
     logs_.push_back(dummy);
 
+    next_index_.insert(next_index_.begin(), peers_.size(), logs_.size());
+    match_index_.insert(match_index_.begin(), peers_.size(), 0);
+
     // TODO: read persist()
     sche_->addTask(std::bind(&Raft::onElection, this));
 
@@ -43,7 +47,7 @@ Raft::Raft(std::vector<PolishedRpcClient::SPtr> peers, uint32_t me,
 
 Raft::~Raft() {
     stop();
-    LOG_INFO << "~Raft()";
+    LOG_DEBUG << "~Raft()";
 }
 
 bool Raft::append(const std::string& cmd, uint32_t& index, uint32_t& term) {
@@ -56,8 +60,6 @@ bool Raft::append(const std::string& cmd, uint32_t& index, uint32_t& term) {
         entry.set_index(index);
         entry.set_command(cmd);
         logs_.push_back(entry);
-        LOG_DEBUG << "leader:" << me_ << " term:" << term <<" append a cmd["
-                  << cmd << "]";
     }
     return is_leader;
 }
@@ -70,6 +72,7 @@ bool Raft::isKilled() {
     return role_ == Dead;
 }
 
+// 从节点没收到心跳包，开启定时选举
 void Raft::onElection() {
     while (true) {
         int64_t start_time = reyao::GetCurrentTime();
@@ -77,7 +80,7 @@ void Raft::onElection() {
         usleep(expierd_ms * 1000);
         // FIXME: 退出时 Raft 先析构会导致访问已析构内存，未定义行为
         if (role_ == Role::Dead) {
-            LOG_INFO <<  me_ << " quit onElection";
+            LOG_DEBUG <<  me_ << " quit onElection";
             return;
         }
         if (last_active_time_ < start_time) {
@@ -90,9 +93,9 @@ void Raft::onElection() {
 
 void Raft::kickoffElection() {
     last_active_time_ = reyao::GetCurrentTime();
-    convertToCandidate();
+    convertToPreCandidate();
     std::shared_ptr<RequestVoteArgs> args(new RequestVoteArgs);
-    args->set_term(current_term_);
+    args->set_term(current_term_ + 1);
     args->set_candidate_id(me_);
     args->set_last_log_index(getLastLogIndex());
     args->set_last_log_term(getLastLogTerm());
@@ -102,7 +105,27 @@ void Raft::kickoffElection() {
         }
         sche_->addTask([=]() {
             if (!sendRequestVote(i, args)) {
-                LOG_INFO << "sendRequestVote " << me_ << " -> " << i << " failed";
+                LOG_DEBUG << "sendRequestVote " << me_ << " -> " << i << " failed";
+            }
+        });
+    }
+}
+
+void Raft::PreElection() {
+    last_active_time_ = reyao::GetCurrentTime();
+    convertToPreCandidate();
+    std::shared_ptr<RequestVoteArgs> args(new RequestVoteArgs);
+    args->set_term(current_term_ + 1);
+    args->set_candidate_id(me_);
+    args->set_last_log_index(getLastLogIndex());
+    args->set_last_log_term(getLastLogTerm());
+    for (size_t i = 0; i < peers_.size(); i++) {
+        if (i == me_) {
+            continue;
+        }
+        sche_->addTask([=]() {
+            if (!sendRequestVote(i, args)) {
+                LOG_DEBUG << "sendRequestVote " << me_ << " -> " << i << " failed";
             }
         });
     }
@@ -112,7 +135,7 @@ void Raft::convertToLeader() {
     if (role_ != Candidate) {
         return;
     }
-    LOG_DEBUG << me_ << " convert to leader. term: " << current_term_;
+    LOG_INFO << me_ << " convert to leader. term: " << current_term_;
     role_ = Leader;
     next_index_ = std::vector<uint32_t>(peers_.size()); 
     match_index_ = std::vector<uint32_t>(peers_.size());
@@ -122,8 +145,15 @@ void Raft::convertToLeader() {
     // TODO: persist()
 }
 
+void Raft::convertToPreCandidate() {
+    LOG_INFO << me_ << " convert to pre_candidate. term: " << current_term_;
+    role_ = PreCandidate;
+    vote_for_ = me_;
+    num_of_vote_ = 1;
+}
+
 void Raft::convertToCandidate() {
-    LOG_DEBUG << me_ << " convert to candidate. term: " << current_term_;
+    LOG_INFO << me_ << " convert to candidate. term: " << current_term_;
     role_ = Candidate;
     ++current_term_;
     vote_for_ = me_;
@@ -143,7 +173,7 @@ void Raft::convertToFollower(uint32_t term) {
 
 void Raft::sendHeartBeat() {
     while (!isKilled()) {
-        usleep(100 * 1000);
+        usleep(100 * 1000); // send heartbeat per 100 ms
         // FIXME: 退出时 Raft 先析构会导致访问已析构内存，未定义行为
         if (role_ != Leader || role_ == Dead) {
             LOG_INFO << me_ << " quit sendHeartBeat";
@@ -157,6 +187,7 @@ void Raft::sendHeartBeat() {
 
         last_broadcast_time_ = now;
 
+        int term = current_term_; //NOTE: 先保存 term，防止心跳包发到一半发现新主节点从而修改到最新 term，这样就会有两个相同 term 的主节点发送心跳包
         for (size_t i = 0; i < peers_.size(); i++) {
             if (i == me_) {
                 continue;
@@ -164,7 +195,7 @@ void Raft::sendHeartBeat() {
             // TODO: how to send entries?
             uint32_t next_index = next_index_[i];
             std::shared_ptr<AppendEntriesArgs> args(new AppendEntriesArgs);
-            args->set_term(current_term_);
+            args->set_term(term);
             args->set_leader_id(me_);
             args->set_prev_log_index(getPrevLogIndex(i));
             args->set_prev_log_term(getPrevLogTerm(i));
@@ -213,15 +244,12 @@ uint32_t Raft::getPrevLogTerm(uint32_t peer) const {
 }
 
 void Raft::advanceCommitIndex() {
-    // match_index_记录着所有server已经获得的log
-	// 取其中位数（多数server）的值作为raft集群可以向上层提交的log
+    // 主节点更新commit_index
+    // 需要找到过半从节点都收到的日志
     std::vector<uint32_t> match_index(match_index_);
     match_index[me_] = logs_.size() - 1;
     std::sort(match_index.begin(), match_index.end());
     uint32_t N = match_index[match_index.size() / 2];
-    LOG_DEBUG << me_ << "advanceCommitIndex, N:" << N << " commit_index:"
-              << commit_index_ << " logs_[N].term:" << logs_[N].term()
-              << " current_term:" << current_term_;
     if (role_ == Leader && N > commit_index_ &&
         logs_[N].term() == current_term_) {
         // TODO: see paper 5.4
@@ -271,28 +299,48 @@ bool Raft::sendAppendEntries(uint32_t peer, std::shared_ptr<AppendEntriesArgs> a
 
 void Raft::onRequestVoteReply(std::shared_ptr<RequestVoteArgs> args, 
                               std::shared_ptr<RequestVoteReply> reply) {
-    if (!reply->vote_granted()) {
-        if (reply->term() > current_term_) {
-            convertToFollower(reply->term());
+    if (role_ == PreCandidate) {
+        if (!reply->vote_granted()) {
+            if (reply->term() > current_term_) {
+                convertToFollower(reply->term());
+            }
         }
-    } 
-    ++num_of_vote_;
-    if (num_of_vote_ > peers_.size() / 2) {
-        convertToLeader();
-        sche_->addTask(std::bind(&Raft::sendHeartBeat, this));
+        ++num_of_vote_;
+        if (num_of_vote_ > peers_.size() / 2 && role_ == PreCandidate) {
+            convertToCandidate();
+            for (uint32_t i = 0; i < peers_.size(); i++) {
+                if (i == me_)   continue;
+                sche_->addTask([=]() {
+                    if (!sendRequestVote(i, args)) {
+                        LOG_DEBUG << "sendRequestVote " << me_ << " -> " << i << " failed";
+                    }
+                });
+            }
+        }
+    } else if (role_ == Candidate) {
+        if (!reply->vote_granted()) {
+            if (reply->term() > current_term_) {
+                convertToFollower(reply->term());
+            }
+        }
+        ++num_of_vote_;
+        if (num_of_vote_ > peers_.size() / 2 && role_ == Candidate) {
+            convertToLeader();
+            sche_->addTask(std::bind(&Raft::sendHeartBeat, this));
+        }
     }
-
 }
     
 void Raft::onAppendEntriesReply(uint32_t peer,
                                 std::shared_ptr<AppendEntriesArgs> args, 
                                 std::shared_ptr<AppendEntriesReply> reply) {
     if (args->term() != current_term_) {
-        // 任期不同，有别的server成为leader并更改了me这个旧leader的任期
+        // 该主节点已经变成从节点
         return;
     }
     if (reply->term() > current_term_) {
-        // 有term更新的leader
+        // 发现更新任期
+        // LOG_FMT_INFO("server:%d:%d find a reply fome term:%d", me_, current_term_, reply->term());
         convertToFollower(reply->term());
         return;
     }
@@ -302,7 +350,7 @@ void Raft::onAppendEntriesReply(uint32_t peer,
                   << " match_index:" << args->prev_log_index() << " -> "
                   << args->prev_log_index() + args->entries().size();
 
-        match_index_[peer] = args->prev_log_index() + args->entries().size();
+        match_index_[peer] = args->prev_log_index() + args->entries_size();
         next_index_[peer] = match_index_[peer] + 1;
         // 看看是否大部分server都更新的log index，如果有更新，说明可以往上层应用提交
         advanceCommitIndex();
@@ -343,6 +391,7 @@ MessageSPtr Raft::RequestVote(std::shared_ptr<RequestVoteArgs> args) {
               << getLastLogIndex() << " last_log_term:" << getLastLogTerm() << "]";
     
     std::shared_ptr<RequestVoteReply> reply(new RequestVoteReply);
+
     if (args->term() < current_term_) {
         // 有更新的任期
         reply->set_term(current_term_);
@@ -355,8 +404,8 @@ MessageSPtr Raft::RequestVote(std::shared_ptr<RequestVoteArgs> args) {
         convertToFollower(args->term());
     }
 
+    // vote_for_ == args->candidate_id() 表明真正的选举
     reply->set_term(current_term_);
-    // TODO: see paper 5.4
     if ((vote_for_ == -1 || vote_for_ == args->candidate_id()) &&
         isLogMoreUpToDate(args->last_log_index(), args->last_log_term())) {
         vote_for_ = args->candidate_id();
@@ -381,26 +430,25 @@ MessageSPtr Raft::AppendEntries(std::shared_ptr<AppendEntriesArgs> args) {
     last_active_time_ = reyao::GetCurrentTime();
 
     std::shared_ptr<AppendEntriesReply> reply(new AppendEntriesReply);
-    // 用conflictIndex记录第一个不同步的log
-	// 目前对于不匹配的log，会不断回滚
+    // 用 conflictIndex 记录第一个不同步的log
+	// 目前对于不匹配的 log，会不断回滚
     bool success = false;
     uint32_t conflict_index = 0;
     uint32_t conflict_term = 0;
-
+    // LOG_FMT_INFO("server:%d:%d recv entries from leader:%d:%d", me_, current_term_, args->leader_id(), args->term());
     if (args->term() < current_term_) {
-        // 收到旧leader的消息
+        // 旧的主节点发来心跳包
         handleReply(reply, success, conflict_index, conflict_term);
         return reply;
     }
 
     if (args->term() > current_term_) {
-        // 收到leader的请求且发现自己没有更新任期
+        // 收到新的主节点的心跳包并发现当前节点没有更新任期
         convertToFollower(args->term());
     }
 
     if (logs_.size() - 1 < args->prev_log_index()) {
-        // server的最后一条索引小于leader记录的最后一条索引
-		// 说明server丢失了logs_.size()到leader.nextIndex[server]之间的log
+        // 从节点缺失主节点的部分记录
         conflict_index = logs_.size();
         conflict_term = 0;
         handleReply(reply, success, conflict_index, conflict_term);
@@ -409,10 +457,6 @@ MessageSPtr Raft::AppendEntries(std::shared_ptr<AppendEntriesArgs> args) {
 
     if (args->prev_log_index() > 0 && 
         logs_[args->prev_log_index()].term() != args->prev_log_term()) {
-        // leader记录的follower最后一条log的任期与follower上的log不同步
-		// follower应该告知leader第一个不同步的term的位置
-		// 如果leader找不到这个不同步的任期，则从这个位置开始重新同步
-		// 如果leader能找到这个任期的log，则从leader的log上最后一条这个任期的log往后同步
         conflict_term = logs_[args->prev_log_index()].term();
         for (size_t i = 1; i < logs_.size(); i++) {
             // 找到第一个冲突term的位置
@@ -427,21 +471,37 @@ MessageSPtr Raft::AppendEntries(std::shared_ptr<AppendEntriesArgs> args) {
     
     // leader发送的prevLogIndex之前的log与follower同步了
 	// follower可以接收leader的log，把其添加到log中并持久化
-    uint32_t index = args->prev_log_index();
-    const auto& entries = args->entries();
-    for (int i = 0; i < entries.size(); i++) {
-        ++index;
-        if (index > logs_.size() - 1) {
-            logs_.insert(logs_.end(), entries.begin(), entries.end());
+    std::vector<LogEntry> logs;
+    for (int i = 0; i < args->entries_size(); i++) {
+        const LogEntry& entry = args->entries(i);
+        logs.push_back(entry);
+    }
+
+    // logs_.erase(logs_.begin() + args->prev_log_index() + 1, logs_.end());
+    // const LogEntry& last_entry = args->entries(args->entries_size() - 1);
+    // uint32_t index = getLastLogIndex() + args->prev_log_index() + 1;
+
+    for (uint32_t i = 0; i < logs.size(); i++) {
+        uint32_t index = args->prev_log_index() + 1 + i;
+        if (index > getLastLogIndex()) {
+            logs_.insert(logs_.end(), logs[i]);
         } else {
-            if (logs_[index].term() != entries[index].term()) {
+            if (logs_[index].term() != logs[i].term()) {
                 // 删除follower与leader不同步的log
+                LOG_FMT_INFO("find me:%d log conflict with leader:%d.start_index:%d, end_index:%d", me_, args->leader_id(), index, getLastLogIndex());
                 logs_.erase(logs_.begin() + index, logs_.end());
-                logs_.insert(logs_.end(), entries[index]);
+                logs_.insert(logs_.end(), logs[i]);
             }
             // term一样什么也不做，跳过
         }
     }
+    // uint32_t prev_log_index = args->prev_log_index();
+    // if (prev_log_index < logs_.size() - 1) {
+    //     // 出现了在 follower 和 leader 不同步的 log
+    //     logs_.pop_back();
+    // }
+    // logs_.insert(logs_.end(), logs.begin(), logs.end());
+
 
     // TODO: persist()
 
@@ -451,11 +511,17 @@ MessageSPtr Raft::AppendEntries(std::shared_ptr<AppendEntriesArgs> args) {
         if (getLastLogIndex() < commit_index_) {
             commit_index_ = getLastLogIndex();
         }
+        applyLog();
     }
 
     success = true;
     handleReply(reply, success, conflict_index, conflict_term);
     return reply;
+}
+
+void Raft::defaultApplyFunc(uint32_t server, LogEntry entry) {
+	(void) server;
+	LOG_DEBUG << toString() << " :apply msg index=" << entry.index();
 }
 
 } //namespace raftcpp

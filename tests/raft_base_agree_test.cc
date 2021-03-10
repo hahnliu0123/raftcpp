@@ -11,7 +11,7 @@ TEST(raft_election_test, TestReElection) {
     g_logger->setLevel(LogLevel::INFO);
 
     Scheduler sche;
-    Config cfg(&sche, 10);
+    Config cfg(&sche, 5);
     sche.startAsync();
 
     usleep(10 * 1000);

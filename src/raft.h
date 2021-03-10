@@ -20,6 +20,7 @@ class Raft {
 public:
     enum Role {
         Follower = 0,
+        PreCandidate,
         Candidate,
         Leader,
         Dead,
@@ -41,6 +42,23 @@ public:
         return current_term_; 
     }
     void setApplyLogFunc(ApplyLogFunc func) { apply_func_ = func; }
+    void defaultApplyFunc(uint32_t server, LogEntry);
+    std::string toString()
+    {
+        std::ostringstream os;
+        os << "server(id=" << me_ << ", term=" << current_term_ << ", log=[";
+        for (const LogEntry &entry : logs_)
+        {
+            os << "<index=" << entry.index() << ", term=" << entry.term() << ">";
+        }
+        os << "], peers(";
+        for (const PolishedRpcClient::SPtr &peer : peers_)
+        {
+            os << (peer->isConnected() ? "1" : "0") << ",";
+        }
+        os << "))";
+        return os.str();
+    }
     std::vector<PolishedRpcClient::SPtr>& getPeers() { return peers_; }
     
     // server election, run in a coroutine to see if server should kick off election
@@ -49,9 +67,11 @@ public:
     // void stateMonitor();
     // kick off an election when server doesn't receive heartbeat from leader in a duration
     void kickoffElection();
+    void PreElection();
     
     // state change
     void convertToLeader();
+    void convertToPreCandidate();
     void convertToCandidate();
     void convertToFollower(uint32_t term);
 
@@ -64,6 +84,7 @@ public:
     uint32_t getLastLogTerm() const;
     uint32_t getPrevLogIndex(uint32_t peer) const;
     uint32_t getPrevLogTerm(uint32_t peer) const;
+    reyao::rpc::RpcServer& getRpcServer() { return server_; }
 
     void advanceCommitIndex();
     void handleReply(std::shared_ptr<AppendEntriesReply> reply, bool success, uint32_t conflict_index, uint32_t conflict_term);
