@@ -115,8 +115,8 @@ private:
     int32_t vote_for_;
     std::vector<LogEntry> logs_;
 
+
     uint32_t num_of_vote_;
-    
     uint32_t commit_index_;
     uint32_t last_applied_;
 
@@ -124,7 +124,7 @@ private:
     std::vector<uint32_t> match_index_;
 
     int64_t last_broadcast_time_;
-    //FIXME: add apply field
+
     ApplyLogFunc apply_func_;
 
     Role role_;

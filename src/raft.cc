@@ -23,7 +23,6 @@ Raft::Raft(std::vector<PolishedRpcClient::SPtr> peers, uint32_t me,
       role_(Role::Follower),
       last_active_time_(reyao::GetCurrentTime()),
       sche_(sche),
-      // FIXME: server's addr field should be a value
       server_(sche, addr) {
     
     // register Rpc
@@ -40,9 +39,7 @@ Raft::Raft(std::vector<PolishedRpcClient::SPtr> peers, uint32_t me,
     next_index_.insert(next_index_.begin(), peers_.size(), logs_.size());
     match_index_.insert(match_index_.begin(), peers_.size(), 0);
 
-    // TODO: read persist()
     sche_->addTask(std::bind(&Raft::onElection, this));
-
 }
 
 Raft::~Raft() {
@@ -142,7 +139,6 @@ void Raft::convertToLeader() {
     for (size_t i = 0; i < peers_.size(); i++) {
         next_index_[i] = getLastLogIndex() + 1;
     }
-    // TODO: persist()
 }
 
 void Raft::convertToPreCandidate() {
@@ -158,7 +154,6 @@ void Raft::convertToCandidate() {
     ++current_term_;
     vote_for_ = me_;
     num_of_vote_ = 1;
-    // TODO: persist()
 }
 
 
@@ -168,7 +163,6 @@ void Raft::convertToFollower(uint32_t term) {
     current_term_ = term;
     vote_for_ = -1;
     num_of_vote_ = 0;
-    // TODO: persist()
 }
 
 void Raft::sendHeartBeat() {
@@ -182,7 +176,7 @@ void Raft::sendHeartBeat() {
 
         int64_t now = reyao::GetCurrentTime();
         if (now < last_broadcast_time_ + 100) {
-            return; //NOTE:
+            return;
         }
 
         last_broadcast_time_ = now;
@@ -192,7 +186,6 @@ void Raft::sendHeartBeat() {
             if (i == me_) {
                 continue;
             }
-            // TODO: how to send entries?
             uint32_t next_index = next_index_[i];
             std::shared_ptr<AppendEntriesArgs> args(new AppendEntriesArgs);
             args->set_term(term);
@@ -276,8 +269,6 @@ void Raft::applyLog() {
     }
 }
 
-// @args index--candidate lastLogIndex
-//       term--candidate lastLogTerm
 bool Raft::isLogMoreUpToDate(uint32_t index, uint32_t term) {
     return term > getLastLogTerm() ||
            (term == getLastLogTerm() && index >= getLastLogIndex());
@@ -352,13 +343,9 @@ void Raft::onAppendEntriesReply(uint32_t peer,
 
         match_index_[peer] = args->prev_log_index() + args->entries_size();
         next_index_[peer] = match_index_[peer] + 1;
-        // 看看是否大部分server都更新的log index，如果有更新，说明可以往上层应用提交
         advanceCommitIndex();
     } else {
         if (reply->conflict_term() != 0) {
-            // server的PrevLog的term冲突
-			// 找到leader的conflictTerm出现的最后位置
-			// 如果没有再找conflictIndex
             uint32_t last_index_of_conflict_term = 0;
             for (size_t i = args->prev_log_index(); i > 0; i--) {
                 if (logs_[i].term() == reply->conflict_term()) {
@@ -367,15 +354,11 @@ void Raft::onAppendEntriesReply(uint32_t peer,
                 }
             }
             if (last_index_of_conflict_term == 0) {
-                // leader的log中没有reply.ConflictTerm这个任期的日志
-			    // 那么从follower首次出现ConflictTerm的位置开始同步
                 next_index_[peer] = reply->conflict_index();
             } else {
-                // 从leader的log中最后一个reply.ConflictTerm的下一个log开始同步
                 next_index_[peer] = last_index_of_conflict_term + 1;
             }
         } else {
-            // follower记录的日志缺失
             next_index_[peer] = reply->conflict_index();
         }
     }
