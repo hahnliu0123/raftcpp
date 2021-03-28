@@ -131,14 +131,14 @@ int Config::one(const std::string& cmd, int32_t expected_server, bool retry) {
     do {
         uint32_t index = 0;
         // find leader and append a log, then return log index
-        LOG_WARN << "one";
+        // LOG_WARN << "one";
         for (uint32_t i = 0; i < num_; i++) {
             server = (server + 1) % num_;
             if (connectState_[server]) {
                 uint32_t index1, term;
                 bool leader = rafts_[server]->append(cmd, index1, term);
                 if (leader) {
-                    LOG_WARN << "leader append index1" << index1;
+                   // LOG_WARN << "leader append index1" << index1;
                     index = index1;
                     break;
                 }

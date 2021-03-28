@@ -1,0 +1,1 @@
+/usr/bin/c++  -ggdb -Wall -Werror -Wno-unused-result -Wno-maybe-uninitialized -std=c++11 -rdynamic -fPIC -O0 -g  -rdynamic CMakeFiles/kv_clerk.dir/kv_clerk.cc.o  -o ../bin/kv_clerk  -Wl,-rpath,/home/wsl/project/raftcpp/build/third_party/reyao/lib:/usr/local/lib ../lib/libraftcpp.a ../third_party/reyao/lib/libreyao.so -lpthread -ldl /usr/local/lib/libprotobuf.so -lpthread -lz 

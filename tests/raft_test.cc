@@ -116,9 +116,8 @@ TEST(TestReplication, TestFailNoArgee) {
     sche.startAsync();
     Config cfg(&sche, servers);
     
+    auto leader = cfg.checkOneLeader();
     cfg.one("10", servers, false);
-
-    int leader = cfg.checkOneLeader();
     cfg.setConnect((leader + 1) % servers, false);
     cfg.setConnect((leader + 2) % servers, false);
     cfg.setConnect((leader + 3) % servers, false);
