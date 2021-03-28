@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../lib/libraftcpp.a  CMakeFiles/raftcpp.dir/args.pb.cc.o CMakeFiles/raftcpp.dir/raft.cc.o
-/usr/bin/ranlib ../lib/libraftcpp.a

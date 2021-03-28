@@ -1,1 +1,0 @@
-/usr/bin/c++  -ggdb -Wall -Werror -Wno-unused-result -std=c++11 -rdynamic -fPIC -O3 -g  -rdynamic CMakeFiles/bytearray_test.dir/bytearray_test.cc.o  -o ../../bin/bytearray_test  -Wl,-rpath,/home/wsl/project/raftcpp/build/third_party/reyao/lib:/usr/local/lib ../../lib/libreyao.so -lpthread -ldl /usr/local/lib/libprotobuf.so -lpthread -lz 
