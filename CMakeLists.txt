@@ -27,11 +27,6 @@ if (Protobuf_FOUND)
     include_directories(${Protobuf_INCLUDE_DIRS})
 endif()
 
-find_package(ZLIB REQUIRED)
-if (ZLIB_FOUND)
-    include_directories(${ZLIB_INCLUDE_DIRS})
-endif()
-
 add_subdirectory(src)
 add_subdirectory(tests)
 add_subdirectory(third_party/reyao)
